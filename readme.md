@@ -1,112 +1,232 @@
-SoundCloud Scraper
+# 🎵 SCRipper - SoundCloud Downloader Web App
 
-A Python-based command-line tool to download tracks and playlists from SoundCloud, convert them to 320kbps MP3, and embed metadata and album art.
+A modern web application for downloading SoundCloud tracks and playlists, built with Node.js, Express, React, and Docker.
 
-Features
+## Features
 
-Individual Tracks & Playlists: Download a single track or an entire SoundCloud playlist.
+- 🎵 **Download Tracks & Playlists**: Download individual tracks or entire SoundCloud playlists
+- 🎨 **Modern React UI**: Beautiful, responsive web interface
+- 🐳 **Dockerized**: Easy deployment with Docker Compose
+- 🚀 **Node.js Backend**: Fast Express API server
+- 🎧 **High-Quality Audio**: Converts to 320kbps MP3
+- 🏷️ **Metadata Embedding**: Automatically embeds ID3 tags and album art
+- 📥 **File Management**: Download and manage your downloaded files through the web UI
 
-Cookie-Based Authentication: Extract and use Chrome/Chromium cookies for private or age-restricted content.
+## Project Structure
 
-High-Quality MP3 Conversion: Convert to 320kbps MP3 using ffmpeg under the hood.
+```
+SCRipper/
+├── server/              # Node.js Express backend
+│   ├── services/       # Business logic (downloader, converter, metadata)
+│   ├── index.js        # Express server entry point
+│   └── package.json    # Backend dependencies
+├── client/             # React frontend
+│   ├── src/           # React source files
+│   ├── package.json   # Frontend dependencies
+│   └── vite.config.js # Vite configuration
+├── docker-compose.yml # Docker orchestration
+└── README.md          # This file
+```
 
-Rich Metadata Embedding: Embed ID3 tags (Title, Artist, Album) and cover art automatically.
+## Prerequisites
 
-Progress Indicators: Real-time tqdm progress bars for track processing.
+- **Docker** and **Docker Compose** installed
+- OR **Node.js** 20+ and **npm** for local development
 
-Rate Limit Handling: Automatic retries and back-off on HTTP 429 (Too Many Requests).
+## Quick Start with Docker (Recommended)
 
+1. **Clone the repository**
+   ```bash
+   git clone <your-repo-url>
+   cd SCRipper
+   ```
 
-🛠️ Prerequisites
+2. **Build and start the containers**
+   ```bash
+   docker-compose up --build
+   ```
 
-Python ≥ 3.7
+3. **Access the application**
+   - Web UI: http://localhost
+   - API: http://localhost:3001
 
-Git (for cloning the repository)
+4. **Stop the containers**
+   ```bash
+   docker-compose down
+   ```
 
-Google Chrome or Chromium (for cookie extraction)
+## Local Development
 
-FFmpeg (managed automatically via imageio-ffmpeg)
+### Backend Setup
 
-🛠️ Installation
+1. **Navigate to server directory**
+   ```bash
+   cd server
+   ```
 
-# 1. Clone the repo
-git clone https://github.com/<your-username>/soundcloud-scraper.git
-cd soundcloud-scraper
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-# 2. (Optional) Create and activate a venv
-python -m venv venv
-# macOS/Linux
-source venv/bin/activate
-# Windows
-venv\Scripts\activate
+3. **Install system dependencies** (Ubuntu/Debian)
+   ```bash
+   sudo apt-get update
+   sudo apt-get install -y python3 python3-pip ffmpeg
+   pip3 install yt-dlp
+   ```
 
-# 3. Install dependencies (or let the script auto-bootstrap)
-pip install -r requirements.txt
+4. **Start the server**
+   ```bash
+   npm start
+   # or for development with auto-reload
+   npm run dev
+   ```
 
-Tip: The script will auto-install any missing Python packages on first run.
+The backend will run on http://localhost:3001
 
-🚀 Usage
+### Frontend Setup
 
-python SCRipper2.py
+1. **Navigate to client directory** (in a new terminal)
+   ```bash
+   cd client
+   ```
 
-When prompted, paste a SoundCloud track or playlist URL.
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-The script will:
+3. **Start the development server**
+   ```bash
+   npm run dev
+   ```
 
-Kill any running Chrome/Chromium instances to ensure fresh cookie access.
+The frontend will run on http://localhost:3000
 
-Download and convert audio to MP3.
+## API Endpoints
 
-Embed ID3 tags and album art.
+### `GET /api/health`
+Health check endpoint.
 
-⚙️ Configuration
-
-All major settings live in the YDL_OPTS dictionary at the top of SCRipper2.py:
-
-YDL_OPTS = {
-    "format": "bestaudio/best",
-    "outtmpl": f"{OUTPUT_DIR}/%(title)s.%(ext)s",
-    "writethumbnail": True,
-    "ffmpeg_location": FFMPEG_BIN,
-    "cookiesfrombrowser": ("chrome",),
-    "retries": 5,                # HTTP retry count
-    "extractor_retries": 5,      # extractor retry count
-    "retry_sleep": [
-        "http:30",               # sleep 30s on HTTP errors (e.g. 429)
-        "extractor:30"           # sleep 30s on extractor errors
-    ],
-    "sleep_requests": 5,         # pause 5s between each HTTP request
+**Response:**
+```json
+{
+  "status": "ok",
+  "message": "SCRipper API is running"
 }
+```
 
-Feel free to tweak these values to match your rate-limit needs or environment.
+### `POST /api/download`
+Download a SoundCloud track or playlist.
 
-🐞 Troubleshooting
+**Request Body:**
+```json
+{
+  "url": "https://soundcloud.com/..."
+}
+```
 
-"No Chrome/Chromium found": Make sure Chrome/Chromium is installed and has been launched at least once.
+**Response:**
+```json
+{
+  "success": true,
+  "total": 1,
+  "results": [
+    {
+      "success": true,
+      "title": "Track Title",
+      "artist": "Artist Name",
+      "path": "/path/to/file.mp3",
+      "filename": "Track Title.mp3"
+    }
+  ]
+}
+```
 
-Rate limit warnings persist: Increase sleep_requests (e.g. to 10 s) or adjust retry_sleep intervals.
+### `GET /api/downloads`
+List all downloaded files.
 
-FFmpeg errors: Verify ffmpeg is installed or let imageio-ffmpeg download the correct binary.
+**Response:**
+```json
+{
+  "files": [
+    {
+      "filename": "Track Title.mp3",
+      "path": "/api/downloads/Track Title.mp3",
+      "size": null
+    }
+  ]
+}
+```
 
-🤝 Contributing
+### `GET /api/downloads/:filename`
+Download a specific file.
+
+### `DELETE /api/downloads/:filename`
+Delete a downloaded file.
+
+## Environment Variables
+
+### Backend
+- `PORT` - Server port (default: 3001)
+- `NODE_ENV` - Environment mode (development/production)
+
+### Frontend
+- `VITE_API_URL` - Backend API URL (default: http://localhost:3001)
+
+## Docker Volumes
+
+The `downloads` directory is mounted as a volume, so downloaded files persist even after containers are stopped.
+
+## Troubleshooting
+
+### Docker Issues
+
+**Port already in use:**
+- Change ports in `docker-compose.yml` if 80 or 3001 are already in use
+
+**Permission errors:**
+- Ensure Docker has proper permissions to create the downloads directory
+
+### Download Issues
+
+**yt-dlp errors:**
+- Ensure yt-dlp is up to date: `pip3 install --upgrade yt-dlp`
+- Some tracks may require authentication (cookies)
+
+**FFmpeg errors:**
+- Verify FFmpeg is installed: `ffmpeg -version`
+- In Docker, FFmpeg is included automatically
+
+### Development Issues
+
+**Module not found:**
+- Run `npm install` in both server and client directories
+- Clear node_modules and reinstall if issues persist
+
+## Technology Stack
+
+- **Backend**: Node.js, Express.js
+- **Frontend**: React, Vite
+- **Audio Processing**: FFmpeg, yt-dlp
+- **Metadata**: node-id3
+- **Containerization**: Docker, Docker Compose
+- **Web Server**: Nginx (production frontend)
+
+## License
+
+This project is licensed under some kinda License.
+
+## Contributing
 
 Contributions welcome! Please:
+1. Fork the repo
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Open a Pull Request
 
-Fork the repo
+---
 
-Create a feature branch (git checkout -b feature/YourFeature)
-
-Commit your changes (git commit -m 'Add YourFeature')
-
-Push to the branch (git push origin feature/YourFeature)
-
-Open a Pull Request
-
-📄 License
-
-This project is licensed under some kinda License. See LICENSE for details.
-
-
-_____________________________________________________________________________
-
-Readme generated with GenAI, excuse any weirdness it's close enough
+**Note**: This tool is for personal use only. Respect SoundCloud's Terms of Service and copyright laws.

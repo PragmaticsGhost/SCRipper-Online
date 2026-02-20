@@ -1,0 +1,17 @@
+{
+  "name": "scripper",
+  "version": "1.0.0",
+  "description": "SoundCloud Ripper - Web Application",
+  "scripts": {
+    "install:all": "cd server && npm install && cd ../client && npm install",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "build": "cd client && npm run build",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up",
+    "docker:down": "docker-compose down"
+  },
+  "keywords": ["soundcloud", "downloader", "webapp"],
+  "author": "",
+  "license": "ISC"
+}

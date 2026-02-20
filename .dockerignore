@@ -1,0 +1,12 @@
+node_modules
+downloads
+*.log
+.env
+.git
+.gitignore
+*.mp3
+*.m4a
+*.webm
+*.pem
+*.key
+*.crt

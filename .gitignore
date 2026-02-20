@@ -1,0 +1,19 @@
+node_modules/
+downloads/
+*.log
+.env
+.DS_Store
+dist/
+build/
+*.mp3
+*.m4a
+*.webm
+*.jpg
+*.png
+
+# Certificates and keys
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
