@@ -2,7 +2,10 @@ version: '3.8'
 
 services:
   caddy:
-    image: caddy:alpine
+    build:
+      context: ./caddy
+      dockerfile: Dockerfile
+    image: scripper-caddy
     container_name: scripper-caddy
     ports:
       - "80:80"
@@ -10,7 +13,6 @@ services:
     environment:
       - DOMAIN=${DOMAIN:-localhost}
     volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
       - caddy_config:/config
     depends_on:
